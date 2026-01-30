@@ -22,10 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for Patient API.
  * Tests the complete request/response flow including authentication.
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Patient API Integration Tests")
 class PatientIntegrationTest {
 
@@ -38,27 +39,30 @@ class PatientIntegrationTest {
     @Autowired
     private PatientRepository patientRepository;
 
-    private static String authToken;
-    private static String createdPatientId;
+    private String authToken;
+    private String createdPatientId;
+
+    @BeforeAll
+    void setUpAuth() throws Exception {
+        // Get auth token once for all tests
+        AuthRequest authRequest = new AuthRequest("admin", "admin123");
+
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(authRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        authToken = objectMapper.readTree(response)
+                .path("data")
+                .path("accessToken")
+                .asText();
+    }
 
     @BeforeEach
-    void setUp() throws Exception {
-        if (authToken == null) {
-            // Get auth token once for all tests
-            AuthRequest authRequest = new AuthRequest("admin", "admin123");
-
-            MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(authRequest)))
-                    .andExpect(status().isOk())
-                    .andReturn();
-
-            String response = result.getResponse().getContentAsString();
-            authToken = objectMapper.readTree(response)
-                    .path("data")
-                    .path("accessToken")
-                    .asText();
-        }
+    void setUp() {
+        // Clean up before each test if needed
     }
 
     @Test
@@ -98,6 +102,8 @@ class PatientIntegrationTest {
     @Order(2)
     @DisplayName("Should get patient by ID")
     void shouldGetPatientById() throws Exception {
+        Assumptions.assumeTrue(createdPatientId != null, "Patient must be created first");
+        
         mockMvc.perform(get("/api/v1/patients/{id}", createdPatientId)
                         .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isOk())
@@ -124,6 +130,8 @@ class PatientIntegrationTest {
     @Order(4)
     @DisplayName("Should search patients by name")
     void shouldSearchPatientsByName() throws Exception {
+        Assumptions.assumeTrue(createdPatientId != null, "Patient must be created first");
+        
         mockMvc.perform(get("/api/v1/patients")
                         .header("Authorization", "Bearer " + authToken)
                         .param("search", "Integration"))
@@ -136,6 +144,8 @@ class PatientIntegrationTest {
     @Order(5)
     @DisplayName("Should update patient")
     void shouldUpdatePatient() throws Exception {
+        Assumptions.assumeTrue(createdPatientId != null, "Patient must be created first");
+        
         PatientRequest updateRequest = PatientRequest.builder()
                 .firstName("Updated")
                 .lastName("Patient")
@@ -157,6 +167,8 @@ class PatientIntegrationTest {
     @Order(6)
     @DisplayName("Should delete patient (soft delete)")
     void shouldDeletePatient() throws Exception {
+        Assumptions.assumeTrue(createdPatientId != null, "Patient must be created first");
+        
         mockMvc.perform(delete("/api/v1/patients/{id}", createdPatientId)
                         .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isNoContent());

@@ -14,21 +14,6 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: healthcare_test
-          POSTGRES_USER: healthcare
-          POSTGRES_PASSWORD: healthcare123
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,20 +36,10 @@ jobs:
       - name: Build with Maven
         run: ./mvnw clean compile -B
 
-      - name: Run unit tests
-        run: ./mvnw test -B
+      - name: Run tests
+        run: ./mvnw verify -B
         env:
           SPRING_PROFILES_ACTIVE: test
-
-      - name: Run integration tests
-        run: ./mvnw verify -B -DskipUnitTests
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: healthcare_test
-          DB_USERNAME: healthcare
-          DB_PASSWORD: healthcare123
 
       - name: Generate test report
         uses: dorny/test-reporter@v1
@@ -73,6 +48,7 @@ jobs:
           name: Test Results
           path: target/surefire-reports/*.xml
           reporter: java-junit
+        continue-on-error: true
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4

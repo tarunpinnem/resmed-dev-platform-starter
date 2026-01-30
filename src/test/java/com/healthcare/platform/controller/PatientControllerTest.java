@@ -3,8 +3,12 @@ package com.healthcare.platform.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.healthcare.platform.dto.PatientRequest;
 import com.healthcare.platform.dto.PatientResponse;
+import com.healthcare.platform.exception.GlobalExceptionHandler;
 import com.healthcare.platform.exception.ResourceNotFoundException;
+import com.healthcare.platform.security.JwtAuthenticationEntryPoint;
+import com.healthcare.platform.security.JwtAuthenticationFilter;
 import com.healthcare.platform.security.JwtTokenProvider;
+import com.healthcare.platform.security.SecurityConfig;
 import com.healthcare.platform.service.PatientService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PatientController.class)
+@Import({SecurityConfig.class, JwtAuthenticationFilter.class, JwtAuthenticationEntryPoint.class, GlobalExceptionHandler.class})
 @DisplayName("Patient Controller Tests")
 class PatientControllerTest {
 
