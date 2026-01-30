@@ -1,0 +1,50 @@
+version: '3.8'
+
+# Development compose file - only starts dependencies
+# Use: docker compose -f docker-compose.dev.yml up -d
+
+services:
+  # PostgreSQL Database for local development
+  postgres:
+    image: postgres:15-alpine
+    container_name: healthcare-postgres-dev
+    environment:
+      POSTGRES_DB: healthcare
+      POSTGRES_USER: healthcare
+      POSTGRES_PASSWORD: healthcare123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthcare -d healthcare"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - healthcare-dev-network
+
+  # PgAdmin for database management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: healthcare-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@healthcare.dev
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - healthcare-dev-network
+    profiles:
+      - tools
+
+networks:
+  healthcare-dev-network:
+    driver: bridge
+
+volumes:
+  postgres_dev_data:

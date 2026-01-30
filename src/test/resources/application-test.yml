@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+app:
+  jwt:
+    secret: test-256-bit-secret-key-for-jwt-signing-which-should-be-at-least-256-bits-long
+    expiration-ms: 86400000
+    issuer: healthcare-platform-test
+
+  rate-limit:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.healthcare.platform: INFO
