@@ -51,6 +51,20 @@ services:
     networks:
       - healthcare-network
 
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: healthcare-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+
 networks:
   healthcare-network:
     driver: bridge

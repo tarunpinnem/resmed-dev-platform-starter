@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -181,7 +182,7 @@ class PatientControllerTest {
         @WithMockUser(roles = "USER")
         @DisplayName("should return paginated patients")
         void shouldReturnPaginatedPatients() throws Exception {
-            Page<PatientResponse> page = new PageImpl<>(List.of(sampleResponse));
+            Page<PatientResponse> page = new PageImpl<>(List.of(sampleResponse), PageRequest.of(0, 20), 1);
             when(patientService.getAllPatients(any(Pageable.class))).thenReturn(page);
 
             mockMvc.perform(get("/api/v1/patients")
@@ -199,7 +200,7 @@ class PatientControllerTest {
         @WithMockUser(roles = "USER")
         @DisplayName("should search patients by name")
         void shouldSearchPatientsByName() throws Exception {
-            Page<PatientResponse> page = new PageImpl<>(List.of(sampleResponse));
+            Page<PatientResponse> page = new PageImpl<>(List.of(sampleResponse), PageRequest.of(0, 20), 1);
             when(patientService.searchPatients(eq("John"), any(Pageable.class))).thenReturn(page);
 
             mockMvc.perform(get("/api/v1/patients")

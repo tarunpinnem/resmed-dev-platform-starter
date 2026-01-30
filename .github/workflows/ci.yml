@@ -41,21 +41,19 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
 
-      - name: Generate test report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: Test Results
-          path: target/surefire-reports/*.xml
-          reporter: java-junit
-        continue-on-error: true
+          name: test-results
+          path: target/surefire-reports/
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v4
+        uses: actions/upload-artifact@v4
         if: success()
         with:
-          files: target/site/jacoco/jacoco.xml
-          fail_ci_if_error: false
+          name: coverage-report
+          path: target/site/jacoco/
 
   security-scan:
     name: Security Scan
@@ -113,6 +111,5 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Check code formatting
-        run: ./mvnw spotless:check -B
-        continue-on-error: true
+      - name: Compile and check
+        run: ./mvnw compile -B

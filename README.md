@@ -3,14 +3,16 @@
 [![CI Pipeline](https://github.com/tarunpinnem/resmed-dev-platform-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/tarunpinnem/resmed-dev-platform-starter/actions)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.org/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-green.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18.2-blue.svg)](https://react.dev/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A **cloud-native, secure, and developer-friendly** healthcare service starter kit. Spin up a production-ready backend in under 2 minutes with best practices baked in.
+A **cloud-native, secure, and developer-friendly** healthcare service starter kit. Spin up a full-stack production-ready application in under 2 minutes with best practices baked in.
 
 ## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
+| **React Frontend** | Modern UI with TypeScript, Tailwind CSS, React Query |
 | **JWT Authentication** | Secure stateless authentication with role-based access |
 | **Patient CRUD API** | Complete RESTful API for healthcare entity management |
 | **OpenAPI/Swagger** | Interactive API documentation at `/swagger-ui.html` |
@@ -36,7 +38,10 @@ cd resmed-dev-platform-starter
 docker compose up -d
 ```
 
-**That's it!** The API is now running at `http://localhost:8080`
+**That's it!** The application is now running:
+- **Frontend UI**: http://localhost:3000
+- **Backend API**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
 
 ### Verify It's Working
 
@@ -47,6 +52,15 @@ curl http://localhost:8080/api/v1/health
 # Expected response:
 # {"status":"UP","timestamp":"2026-01-30T...","liveness":"CORRECT"}
 ```
+
+### Frontend Screenshots
+
+The React frontend includes:
+- **Login Page** - Demo credentials displayed for easy testing
+- **Dashboard** - System health status and recent patients
+- **Patients List** - Paginated table with search
+- **Patient Details** - Full patient information view
+- **Patient Form** - Create and edit patients
 
 ## 📖 API Documentation
 
@@ -198,7 +212,16 @@ curl -X DELETE http://localhost:8080/api/v1/patients/{id} \
 
 ```
 healthcare-platform-starter/
-├── src/
+├── frontend/                     # React Frontend
+│   ├── src/
+│   │   ├── api/                  # API client
+│   │   ├── components/           # React components
+│   │   ├── context/              # Auth context
+│   │   ├── pages/                # Page components
+│   │   └── types/                # TypeScript types
+│   ├── package.json
+│   └── Dockerfile
+├── src/                          # Spring Boot Backend
 │   ├── main/
 │   │   ├── java/com/healthcare/platform/
 │   │   │   ├── config/           # Configuration classes
@@ -222,7 +245,7 @@ healthcare-platform-starter/
 ├── .github/workflows/ci.yml      # CI/CD pipeline
 ├── docker-compose.yml            # Production compose
 ├── docker-compose.dev.yml        # Development compose
-├── Dockerfile                    # Multi-stage build
+├── Dockerfile                    # Backend multi-stage build
 └── pom.xml                       # Maven config
 ```
 
@@ -280,9 +303,16 @@ healthcare-platform-starter/
 # Start only database
 docker compose -f docker-compose.dev.yml up -d
 
-# Run app locally with dev profile
+# Run backend locally with dev profile
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# In another terminal, run frontend
+cd frontend
+npm install
+npm run dev
 ```
+
+Frontend runs at http://localhost:3000 and proxies API requests to the backend.
 
 ## 📝 Response Format
 
