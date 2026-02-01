@@ -1,4 +1,4 @@
-# Healthcare Platform Starter Kit
+# DEV Platform Starter Kit
 
 [![CI Pipeline](https://github.com/tarunpinnem/resmed-dev-platform-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/tarunpinnem/resmed-dev-platform-starter/actions)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.org/projects/jdk/17/)
